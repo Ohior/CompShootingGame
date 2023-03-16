@@ -28,6 +28,7 @@ import com.example.compshootgame.ui.theme.CompShootGameTheme
 import com.example.ohiorgamelib.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.random.Random
 
 data class BulletPosition(val x: Dp, val y: Dp)
 
@@ -46,17 +47,47 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    var shootBullet by remember { mutableStateOf<PressedState>(PressedState.PressedNone) }
                     var shootBullet by remember { mutableStateOf(false) }
-                    var xPosition by remember { mutableStateOf(MAX_WIDTH.value / 2) }
-                    var yPosition by remember { mutableStateOf(MAX_HEIGHT.value - 300) }
+                    val numberOfRock by remember {
+                        mutableStateOf(arrayListOf<Pair<Int, Int>>())
+                    }
+                    var rockPosition = Pair(0, 0)
                     Column(Modifier.fillMaxSize()) {
                         // GAME SCREEN
                         //=====================================================================
+                        var xPosition by remember { mutableStateOf(MAX_WIDTH.value / 2) }
+                        var yPosition by remember { mutableStateOf(MAX_HEIGHT.value - 300) }
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .fillMaxHeight(0.8f)
                                 .border(5.dp, Color.Black)
                         ) {
+                            // Persistently create and add Rocks
+                            rockPosition = Tools.getPersistentPosition(
+                                untilX = MAX_WIDTH.value.toInt(),
+                                untilY = 10
+                            ).collectAsState(
+                                initial = Pair(0, 0)
+                            ).value
+                            numberOfRock.add(rockPosition)
+                            for (i in 1 until numberOfRock.size) {
+                                OhMoveComposeLinear(
+                                    character = CharacterDataclass(
+                                        numberOfRock[i].second.toFloat(),
+                                        heightPercent(70f),
+                                        1500
+                                    )
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .offset(numberOfRock[i].first.dp, it.dp)
+                                            .background(
+                                                Color.Black
+                                            )
+                                    )
+                                }
+                            }
                             // Shoot Bullet
                             Image(
                                 painter = painterResource(id = R.drawable.galaga),
@@ -84,8 +115,6 @@ class MainActivity : ComponentActivity() {
                                 rightClick = { if (xPosition < MAX_WIDTH.value - 100) xPosition += speed })
                             OhGameButton(R.drawable.ic_baseline_back_hand_24) { pressedState ->
                                 //shootBullet = pressedState
-                                if (pressedState == PressedState.PressedDown) {
-                                }
                             }
                         }
                         //=========================================================================
@@ -93,6 +122,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun getRandomPosition(x: Float, y: Float): Pair<Int, Int> {
+        return Pair(Random.nextInt(x.toInt()), Random.nextInt(y.toInt()))
     }
 
     @Composable
