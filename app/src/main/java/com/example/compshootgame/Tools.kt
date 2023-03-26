@@ -11,6 +11,15 @@ object Tools {
         Log.e(tag, message)
     }
 
+    fun createDelay(delayMillis: Long = 1000): Flow<Boolean> {
+        return flow {
+            while (true) {
+                delay(delayMillis)
+                emit(true)
+            }
+        }
+    }
+
     fun getPersistentPosition(
         fromX: Int = 0,
         untilX: Int,

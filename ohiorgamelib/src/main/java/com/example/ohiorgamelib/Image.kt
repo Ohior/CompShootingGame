@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ohMoveImageRepeatable(
-    imagePropertiesX:CharacterDataclass,
-    imagePropertiesY:CharacterDataclass,
+    imagePropertiesX: CharacterDataclass,
+    imagePropertiesY: CharacterDataclass,
     @DrawableRes image: Int,
     contentDescription: String?,
 ): Pair<Float, Float> {
@@ -63,8 +63,8 @@ fun ohMoveImageRepeatable(
 
 @Composable
 fun ohMoveImageLinear(
-    imagePropertiesX:CharacterDataclass,
-    imagePropertiesY:CharacterDataclass,
+    imagePropertiesX: CharacterDataclass,
+    imagePropertiesY: CharacterDataclass,
     @DrawableRes image: Int,
     contentDescription: String?,
 ): Pair<Float, Float> {
@@ -78,13 +78,19 @@ fun ohMoveImageLinear(
     LaunchedEffect(key1 = animateX) {
         animateX.animateTo(
             imagePropertiesX.endValue,
-            animationSpec = FloatTweenSpec(duration = imagePropertiesX.speedMillis, easing = LinearEasing)
+            animationSpec = FloatTweenSpec(
+                duration = imagePropertiesX.speedMillis,
+                easing = LinearEasing
+            )
         )
     }
     LaunchedEffect(key1 = animateY) {
         animateY.animateTo(
             imagePropertiesY.endValue,
-            animationSpec = FloatTweenSpec(duration = imagePropertiesY.speedMillis, easing = LinearEasing)
+            animationSpec = FloatTweenSpec(
+                duration = imagePropertiesY.speedMillis,
+                easing = LinearEasing
+            )
 
         )
     }
@@ -164,7 +170,10 @@ fun OhMoveComposeLinear(
     LaunchedEffect(key1 = animate) {
         animate.animateTo(
             targetValue = character.endValue,
-            animationSpec = FloatTweenSpec(duration = character.speedMillis, easing = LinearEasing)
+            animationSpec = FloatTweenSpec(
+                duration = character.speedMillis,
+                easing = LinearEasing,
+            )
         )
     }
     function(animate.value)
@@ -202,7 +211,7 @@ fun OhMoveComposeRepeat(
 fun OhMoveComposableLinear(
     characterX: CharacterDataclass,
     characterY: CharacterDataclass,
-    function: @Composable (x: Float, y:Float) -> Unit,
+    function: @Composable (x: Float, y: Float) -> Unit,
 ) {
     val animateX = remember {
         Animatable(characterX.startValue)
@@ -229,7 +238,7 @@ fun OhMoveComposableLinear(
 fun OhMoveComposableRepeat(
     characterX: CharacterDataclass,
     characterY: CharacterDataclass,
-    function: @Composable (x: Float, y:Float) -> Unit,
+    function: @Composable (x: Float, y: Float) -> Unit,
 ) {
     val animateX = remember {
         Animatable(characterX.startValue)

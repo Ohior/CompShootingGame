@@ -1,7 +1,10 @@
 package com.example.ohiorgamelib
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.size
@@ -11,8 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import java.util.Timer
 
 @Composable
 fun OhGameButton(
@@ -45,13 +51,10 @@ fun OhGameButton(
 @Composable
 fun OhGameButton(
     @DrawableRes res: Int,
-    function: @Composable (PressedState) -> Unit,
+    function: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    var pressedState by remember {
-        mutableStateOf<PressedState>(PressedState.PressedNone)
-    }
     IconButton(
         onClick = {},
         modifier = Modifier
@@ -64,8 +67,8 @@ fun OhGameButton(
             contentDescription = null
         )
     }
-    pressedState = if (isPressed) {
-        PressedState.PressedDown
-    } else PressedState.PressedUp
-    function(pressedState)
+
+    if (isPressed) {
+        function()
+    }
 }
