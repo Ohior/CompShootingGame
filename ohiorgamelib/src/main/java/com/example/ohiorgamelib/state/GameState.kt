@@ -1,4 +1,4 @@
-package com.example.ohiorgamelib
+package com.example.ohiorgamelib.state
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.BoxWithConstraintsScope

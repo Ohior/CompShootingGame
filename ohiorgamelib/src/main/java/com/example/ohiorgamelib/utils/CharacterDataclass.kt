@@ -1,4 +1,4 @@
-package com.example.ohiorgamelib
+package com.example.ohiorgamelib.utils
 
 import androidx.compose.ui.graphics.Color
 

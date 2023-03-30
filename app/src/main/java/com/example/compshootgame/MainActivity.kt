@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,11 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compshootgame.ui.theme.CompShootGameTheme
 import com.example.ohiorgamelib.*
+import com.example.ohiorgamelib.button.GamePadButton
+import com.example.ohiorgamelib.button.OhGameButton
+import com.example.ohiorgamelib.utils.GameCharacter
+import com.example.ohiorgamelib.utils.GameMutableCharacter
+import com.example.ohiorgamelib.utils.OhTools
 
 
 class MainActivity : ComponentActivity() {
     private val galagaCharacter = GameMutableCharacter(100f, 250f, 100f)
-    private var speed = 3
+    private var galagaSpeed = 3
     private val rocksList =
         arrayListOf(
             GameCharacter(
@@ -76,6 +78,8 @@ class MainActivity : ComponentActivity() {
             ),
         )
     private val bulletList = arrayListOf<GameCharacter>()
+    private var score = 0
+    private var progress = 1f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,17 +91,11 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(Color.LightGray)
                 ) {
-//                    var xPosition by remember { mutableStateOf(galagaCharacter.xPos) }
-//                    var yPosition by remember { mutableStateOf(galagaCharacter.yPos) }
-                    var score by remember { mutableStateOf(0) }
-                    var progress by remember {
-                        mutableStateOf(1f)
-                    }
                     Column(Modifier.fillMaxSize()) {
                         // GAME SCREEN
                         //=====================================================================
-
                         if (progress <= 0.0f) {
+                            // Game over display text
                             Text(
                                 text = "Score $score \n GAME OVER",
                                 modifier = Modifier
@@ -116,7 +114,7 @@ class MainActivity : ComponentActivity() {
                                 textAlign = TextAlign.Center,
                             )
                         } else {
-
+                            // Draw the game area
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -136,6 +134,7 @@ class MainActivity : ComponentActivity() {
                                             fontFamily = FontFamily.Serif
                                         )
                                     )
+                                    // progressbar to indicate life
                                     LinearProgressIndicator(
                                         modifier = Modifier
                                             .padding(20.dp)
@@ -145,97 +144,21 @@ class MainActivity : ComponentActivity() {
                                         color = Color(48, 92, 5, 255)
                                     )
                                 }
+                                // infinity loop engine
                                 if (shouldStartGameEngine()) {
-                                    outer@ for (b in bulletList.indices) {
-                                        // check if bullet is outside the screen
-                                        if (bulletList[b].yPos < 0) {
-                                            bulletList.removeAt(b)
-                                            break
-                                        } else {
-                                            // check for collision
-                                            for (r in rocksList) {
-                                                if (OhTools.characterHasCollided(
-                                                        bulletList[b],
-                                                        r
-                                                    )
-                                                ) {
-                                                    score++
-                                                    bulletList.removeAt(b)
-                                                    rocksList.remove(r)
-                                                    rocksList.add(
-                                                        GameCharacter(
-                                                            OhTools.getRandomPosition(0, 400).toFloat(),
-                                                            OhTools.getRandomPosition(0, 10).toFloat(),
-                                                            30f
-                                                        )
-                                                    )
-                                                    break@outer
-                                                }
-
-                                            }
-                                        }
-                                        val yPos = bulletList[b].yPos - 5
-                                        bulletList[b] = GameCharacter(
-                                            bulletList[b].xPos,
-                                            yPos,
-                                            bulletList[b].size
-                                        )
-                                        Box(
-                                            modifier = Modifier
-                                                .size(bulletList[b].size.dp)
-                                                .offset(bulletList[b].xPos.dp, yPos.dp)
-                                                .clip(RoundedCornerShape(100))
-                                                .background(Color.Red)
-                                        )
-                                    }
-                                    for (b in rocksList.indices) {
-                                        val yPos = rocksList[b].yPos + 1
-                                        // check if rock has left the screen
-                                        if (rocksList[b].yPos > getHeightPercent(78f)) {
-                                            rocksList[b] =
-                                                GameCharacter(
-                                                    OhTools.getRandomPosition(0, 400).toFloat(),
-                                                    OhTools.getRandomPosition(0, 10).toFloat(),
-                                                    30f
-                                                )
-                                        } else {
-                                            rocksList[b] = GameCharacter(
-                                                rocksList[b].xPos,
-                                                yPos,
-                                                rocksList[b].size
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(rocksList[b].size.dp)
-                                                    .offset(
-                                                        rocksList[b].xPos.dp,
-                                                        rocksList[b].yPos.dp
-                                                    )
-                                                    .clip(RoundedCornerShape(100))
-                                                    .background(Color.Black)
-                                            )
-                                            if (OhTools.characterHasCollided(
-                                                    rocksList[b],
-                                                    galagaCharacter
-                                                )
-                                            ) {
-                                                progress -= 0.1f
-                                                rocksList[b] =
-                                                    GameCharacter(
-                                                        OhTools.getRandomPosition(0, 400).toFloat(),
-                                                        OhTools.getRandomPosition(0, 10).toFloat(),
-                                                        30f
-                                                    )
-                                            }
-                                        }
-                                    }
+                                    // Move bullets
+                                    MoveBullets()
+                                    // Move falling rocks
+                                    MoveRocks(getHeightPercent(75f))
                                 }
+                                // Draw Galaga
                                 Image(
                                     painter = painterResource(id = R.drawable.galaga),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(galagaCharacter.size.dp)
                                         .offset(galagaCharacter.xPos.dp, galagaCharacter.yPos.dp)
+                                        .border(1.dp, Color.Blue)
                                 )
                             }
                         }
@@ -250,33 +173,88 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             GamePadButton(
-                                upClick = { if (progress > 0.0f && galagaCharacter.yPos > 0) galagaCharacter.yPos -= speed },
+                                upClick = { if (progress > 0.0f && galagaCharacter.yPos > 0) galagaCharacter.yPos -= galagaSpeed },
                                 downClick = {
-                                    if (progress > 0.0f && galagaCharacter.yPos < getHeightPercent(
-                                            65f
-                                        )
-                                    ) galagaCharacter.yPos += speed
+                                    if (progress > 0.0f &&
+                                        galagaCharacter.yPos < getHeightPercent(65f)
+                                    ) galagaCharacter.yPos += galagaSpeed
                                 },
-                                leftClick = { if (progress > 0.0f && galagaCharacter.xPos > 0) galagaCharacter.xPos -= speed },
-                                rightClick = { if (progress > 0.0f && galagaCharacter.xPos < MAX_WIDTH.value - galagaCharacter.size) galagaCharacter.xPos += speed })
+                                leftClick = { if (progress > 0.0f && galagaCharacter.xPos > 0) galagaCharacter.xPos -= galagaSpeed },
+                                rightClick = { if (progress > 0.0f && galagaCharacter.xPos < MAX_WIDTH.value - galagaCharacter.size) galagaCharacter.xPos += galagaSpeed })
                             OhGameButton(R.drawable.ic_baseline_back_hand_24) {
                                 if (progress > 0.0f && it) {
                                     OhTools.OhCreateDelay(300) {
                                         bulletList.add(
                                             GameCharacter(
-                                                galagaCharacter.xPos + 30,
+                                                galagaCharacter.xPos + (galagaCharacter.size / 2f),
                                                 galagaCharacter.yPos,
                                                 15f
                                             )
                                         )
                                     }
-                                } else if (progress <= 0 && it) {
-                                    progress = 1f
                                 }
                             }
                         }
                         //=========================================================================
                     }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MoveRocks(maxHeight: Float) {
+        for (rock in rocksList.indices) {
+            val yPos = rocksList[rock].yPos + 2
+            Box(
+                modifier = Modifier
+                    .offset(rocksList[rock].xPos.dp, yPos.dp)
+                    .size(rocksList[rock].size.dp)
+                    .clip(RoundedCornerShape(100))
+                    .background(Color.Black)
+            )
+            rocksList[rock] = GameCharacter(
+                rocksList[rock].xPos, yPos, rocksList[rock].size
+            )
+            if (rocksList[rock].yPos > maxHeight ||
+                OhTools.characterHasCollided(
+                    rocksList[rock],
+                    galagaCharacter
+                ).apply { if (this) progress -= 0.1f }
+            ) {
+                rocksList[rock] =
+                    GameCharacter(
+                        OhTools.getRandomPosition(0, 400).toFloat(),
+                        OhTools.getRandomPosition(-500, 10).toFloat(),
+                        rocksList[rock].size
+                    )
+            }
+        }
+    }
+
+    @Composable
+    private fun MoveBullets() {
+        bulletLoop@ for (bullet in bulletList.indices) {
+            val yPos = bulletList[bullet].yPos - 5
+            Box(
+                modifier = Modifier
+                    .offset(bulletList[bullet].xPos.dp, yPos.dp)
+                    .size(bulletList[bullet].size.dp)
+                    .clip(RoundedCornerShape(100))
+                    .background(Color.Red)
+            )
+            bulletList[bullet] =
+                GameCharacter(bulletList[bullet].xPos, yPos, 15f)
+            if (yPos < 0f) {
+                bulletList.removeAt(bullet)
+                break
+            }
+            for (rock in rocksList) {
+                if (OhTools.characterHasCollided(bulletList[bullet], rock)) {
+                    score++
+                    bulletList.removeAt(bullet)
+                    rocksList.remove(rock)
+                    break@bulletLoop
                 }
             }
         }

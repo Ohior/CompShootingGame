@@ -1,4 +1,4 @@
-package com.example.ohiorgamelib
+package com.example.ohiorgamelib.state
 
 sealed class PressedState{
     object PressedDown : PressedState()
