@@ -32,7 +32,7 @@ import com.example.ohiorgamelib.utils.OhTools
 
 
 class MainActivity : ComponentActivity() {
-    private val galagaCharacter = GameMutableCharacter(100f, 250f, 100f)
+    private val galagaCharacter = GameMutableCharacter(100f, 250f, 70f)
     private var galagaSpeed = 3
     private val rocksList =
         arrayListOf(
@@ -176,7 +176,7 @@ class MainActivity : ComponentActivity() {
                                 upClick = { if (progress > 0.0f && galagaCharacter.yPos > 0) galagaCharacter.yPos -= galagaSpeed },
                                 downClick = {
                                     if (progress > 0.0f &&
-                                        galagaCharacter.yPos < getHeightPercent(65f)
+                                        galagaCharacter.yPos < getHeightPercent(70f)
                                     ) galagaCharacter.yPos += galagaSpeed
                                 },
                                 leftClick = { if (progress > 0.0f && galagaCharacter.xPos > 0) galagaCharacter.xPos -= galagaSpeed },
