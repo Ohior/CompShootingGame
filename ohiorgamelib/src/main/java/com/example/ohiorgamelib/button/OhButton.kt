@@ -1,5 +1,6 @@
 package com.example.ohiorgamelib.button
 
+import android.view.MotionEvent
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,39 +15,50 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.ohiorgamelib.state.PressedState
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OhGameButton(
     imageVector: ImageVector,
-    function: @Composable (PressedState) -> Unit,
+    function: @Composable (PressedState, Pair<Float, Float>?) -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
     var pressedState by remember {
         mutableStateOf<PressedState>(PressedState.PressedNone)
+    }
+    var offset by remember {
+        mutableStateOf<Pair<Float, Float>?>(null)
     }
     IconButton(
         onClick = {},
         modifier = Modifier
             .size(50.dp)
-            .background(Color.Red),
-        interactionSource = interactionSource
+            .background(Color.Red)
+            .pointerInteropFilter { motionEvent ->
+                offset = Pair(motionEvent.x, motionEvent.y)
+                when (motionEvent.action) {
+                    MotionEvent.ACTION_DOWN -> pressedState = PressedState.PressedDown
+                    MotionEvent.ACTION_UP -> pressedState = PressedState.PressedUp
+                    MotionEvent.ACTION_MOVE -> pressedState = PressedState.PressedMove
+                }
+                true
+            }
+
     ) {
         Icon(
             imageVector = imageVector,
             contentDescription = null
         )
     }
-    pressedState = if (isPressed) {
-        PressedState.PressedDown
-    } else PressedState.PressedUp
-    function(pressedState)
+    function(pressedState, offset)
 }
 
 @Composable
@@ -80,20 +92,20 @@ fun GamePadButton(
     rightClick: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        OhGameButton(imageVector = Icons.Default.KeyboardArrowUp) {
-            if (it == PressedState.PressedDown) upClick()
+        OhGameButton(imageVector = Icons.Default.KeyboardArrowUp) { pressState, _ ->
+            if (pressState == PressedState.PressedDown) upClick()
         }
         Row {
-            OhGameButton(imageVector = Icons.Default.KeyboardArrowLeft) {
-                if (it == PressedState.PressedDown) leftClick()
+            OhGameButton(imageVector = Icons.Default.KeyboardArrowLeft) { pressState, _ ->
+                if (pressState == PressedState.PressedDown) leftClick()
             }
             Spacer(modifier = Modifier.width(50.dp))
-            OhGameButton(imageVector = Icons.Default.KeyboardArrowRight) {
-                if (it == PressedState.PressedDown) rightClick()
+            OhGameButton(imageVector = Icons.Default.KeyboardArrowRight) { pressState, _ ->
+                if (pressState == PressedState.PressedDown) rightClick()
             }
         }
-        OhGameButton(imageVector = Icons.Default.KeyboardArrowDown) {
-            if (it == PressedState.PressedDown) downClick()
+        OhGameButton(imageVector = Icons.Default.KeyboardArrowDown) { pressState, _ ->
+            if (pressState == PressedState.PressedDown) downClick()
         }
     }
 }

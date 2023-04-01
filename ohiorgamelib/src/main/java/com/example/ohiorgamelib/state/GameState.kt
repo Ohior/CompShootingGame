@@ -13,7 +13,6 @@ class GameState(boxWithConstraintsScope: BoxWithConstraintsScope) {
 
     fun getWidthPercent(percentWidth: Float): Float = (MAX_WIDTH.value * percentWidth) / 100
 
-
     @Composable
     fun shouldStartGameEngine(
         framesPerSec: Float = 10f,
