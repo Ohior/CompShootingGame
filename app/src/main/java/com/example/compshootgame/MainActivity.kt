@@ -34,6 +34,9 @@ import com.example.ohiorgamelib.utils.OhTools
 class MainActivity : ComponentActivity() {
     private val galagaCharacter = GameMutableCharacter(100f, 250f, 70f)
     private var galagaSpeed = 3
+    private val bulletList = arrayListOf<GameCharacter>()
+    private var score = 0
+    private var progress = 1f
     private val rocksList =
         arrayListOf(
             GameCharacter(
@@ -77,9 +80,6 @@ class MainActivity : ComponentActivity() {
                 30f
             ),
         )
-    private val bulletList = arrayListOf<GameCharacter>()
-    private var score = 0
-    private var progress = 1f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
