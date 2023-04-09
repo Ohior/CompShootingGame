@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    //def compose_ui_version = "1.4.0"
+    def compose_ui_version = "1.4.0"
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.foundation:foundation:$compose_ui_version"
     implementation "androidx.compose.material:material:$compose_ui_version"
