@@ -101,9 +101,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .fillMaxHeight(0.8f)
-                                    .background(
-                                        Color.DarkGray
-                                    )
+                                    .background(Color.DarkGray)
                                     .border(5.dp, Color.Red),
                                 style = TextStyle(
                                     fontFamily = FontFamily.Serif,
@@ -119,7 +117,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .fillMaxHeight(0.8f)
-                                    .border(5.dp, Color.Black),
+                                    .border(5.dp, Color.Black), 
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
